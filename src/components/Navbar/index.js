@@ -1,16 +1,15 @@
 import React from "react";
 import { FaBook } from "react-icons/fa";
-import { Nav, NavLink, NavMenu } from "./NavbarElements";
+import { Nav, NavLink, NavMenu, LogoContainer } from "./NavbarElements";
 
 const Navbar = () => {
   return (
     <>
       <Nav>
-        {/* Book Logo */}
-        <div style={{ display: 'flex', alignItems: 'left', marginLeft: '-250px'}}>
-          <FaBook style={{ fontSize: '5rem', marginTop: '2px' }} />
+        <LogoContainer>
+          <FaBook style={{ fontSize: '4.5rem', marginTop: '5px' }} />
           <h1 style={{ margin: '5' }}>Recipe Book</h1>
-        </div>
+        </LogoContainer>
         <NavMenu>
           <NavLink to="/" activeStyle>
             Home

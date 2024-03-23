@@ -13,6 +13,10 @@ const Home = () => {
         </p>
       </div>
       <div>
+        <div>
+          <br>
+          </br>
+        </div>
         <h2><span>Recent Additions</span></h2>
         <ul>
           <li>
