@@ -5,18 +5,38 @@ const SignUp = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isSignUp, setIsSignUp] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        // Handle sign up or login logic here
-        if (isSignUp) {
-            // Handle sign-up
-            console.log("Signing up with email:", email, "and password:", password);
-        } else {
-            // Handle login
-            console.log("Logging in with email:", email, "and password:", password);
+        setIsLoading(true);
+        setError(null);
+    
+        try {
+            const response = await fetch('/pages/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
+    
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Failed to sign up');
+            }
+    
+            // Sign up successful
+            console.log('Sign up successful');
+        } catch (error) {
+            console.error('Error signing up:', error.message);
+            setError(error.message || 'Failed to sign up');
+        } finally {
+            setIsLoading(false);
         }
     };
+    
 
     return (
         <div className="signup-container">
@@ -40,12 +60,15 @@ const SignUp = () => {
                         required
                     />
                 </div>
-                <button type="submit">{isSignUp ? "Sign Up" : "Login"}</button>
+                <button type="submit" disabled={isLoading}>
+                    {isLoading ? 'Signing Up...' : (isSignUp ? 'Sign Up' : 'Login')}
+                </button>
             </form>
+            {error && <p className="error-message">{error}</p>}
             <p>
                 {isSignUp ? "Already have an account?" : "Don't have an account?"}
-                <button onClick={() => setIsSignUp(!isSignUp)}>
-                    {isSignUp ? "Login" : "Sign Up"}
+                <button onClick={() => setIsSignUp(!isSignUp)} disabled={isLoading}>
+                    {isLoading ? 'Loading...' : (isSignUp ? 'Login' : 'Sign Up')}
                 </button>
             </p>
         </div>
