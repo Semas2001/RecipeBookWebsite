@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import "./css/register.css";
 
-const Signup = () => {
+const Login = () => {
     const [email, setEmail] = useState("");
-    const [name, setname] = useState("");
+
     const [password, setPassword] = useState("");
     const [isSignUp, setIsSignUp] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
@@ -41,17 +41,9 @@ const Signup = () => {
 
     return (
         <div className="signup-container">
-            {isSignUp ? <h1>Sign Up</h1> : <h1>Login</h1>}
+            <h1>Login</h1>
             <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Name:</label>
-                    <input
-                        type="Name"
-                        value={name}
-                        onChange={(e) => setname(e.target.value)}
-                        required
-                    />
-                </div>
+
                 <div>
                     <label>Email:</label>
                     <input
@@ -89,4 +81,4 @@ const Signup = () => {
 
 
 
-export default Signup;
+export default Login;

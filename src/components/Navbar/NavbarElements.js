@@ -22,7 +22,7 @@ export const NavLink = styled(Link)`
   &:hover,
   &:active {
     color: #000;
-    background-color: #fff8e7;
+    background-color: #fff8d7;
 	border-radius: 40px;
   }
 `;
