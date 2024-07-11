@@ -3,7 +3,6 @@ import "./css/register.css";
 
 const Login = () => {
     const [email, setEmail] = useState("");
-
     const [password, setPassword] = useState("");
     const [isSignUp, setIsSignUp] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
