@@ -1,0 +1,18 @@
+[
+    {
+      "id": "1",
+      "title": "Chicken Alfredo",
+      "ingredients": ["Chicken", "Pasta", "Cream"],
+      "instructions": "Cook the pasta and mix with cream and chicken.",
+      "categoryId": "1",
+      "imageUrl": "/Photo1.jpg"
+    },
+    {
+      "id": "2",
+      "title": "Grandma's Apple Pie",
+      "ingredients": ["Apples", "Sugar", "Butter", "Flour"],
+      "instructions": "Mix ingredients and bake in a pie crust.",
+      "categoryId": "4",
+      "imageUrl": "/Photo2.jpg"
+    }
+  ]
