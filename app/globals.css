@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #FBF7F2;
+}
+
+@font-face {
+  font-family: 'Font1'; /* Custom font name */
+  src: url('/fonts/CBB.woff') format('truetype'); /* Path to the font */
+}
+
+@font-face {
+  font-family: 'Font2'; /* Custom font name */
+  src: url('/fonts/CBR.woff') format('truetype'); /* Path to the font */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground: #FBF7F2;
+  }
+}
+.font1 {
+  font-family: 'Font1'
+}
+
+.font2 {
+  font-family: 'Font2'
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif, 'Font1', 'Font2';
+  color: #62645b;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
