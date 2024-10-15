@@ -1,9 +1,15 @@
-import connectMongo from "@/lib/mongodb"; // Adjust the import based on your file structure
-import RecipeModel, { Recipe } from "@/models/Recipe"; // Adjust the import based on your file structure
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import Recipe from "@/models/Recipe"
+import dbConnect from '@/lib/mongodb';
 
 export async function GET() {
-  await connectMongo(); // Connect to MongoDB
-  const recipes: Recipe[] = await RecipeModel.find().populate("categoryId");
-  return NextResponse.json(recipes);
+  try {
+    await dbConnect();
+    const recipes = await Recipe.find();
+    console.log(recipes)
+    return NextResponse.json(recipes); 
+  } catch (error: any) {
+    console.error('Failed to fetch recipes:', error);
+    return NextResponse.error();
+  }
 }

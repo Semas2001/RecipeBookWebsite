@@ -21,6 +21,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "components/Navbar/NavbarElements.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "components/Navbar/NavbarElements.js", "app/api/recipes/route.js", "app/api/categories/route.js", "models/Recipe.js", "models/Category.ts"],
   "exclude": ["node_modules"]
 }

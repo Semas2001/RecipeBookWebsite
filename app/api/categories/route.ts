@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/mongodb'; // Your database connection utility
-import Recipe from '@/models/Recipe'; // Ensure this path is correct
+import dbConnect from '@/lib/mongodb';
+import Category from '@/models/Category';
 
 export async function GET() {
   try {
-    await dbConnect(); // Connect to the database
-    const recipes = await Recipe.find(); // Fetch all recipes
-    return NextResponse.json(recipes); // Return recipes as JSON
-  } catch (error) {
+    await dbConnect();
+    const categories = await Category.find();
+    console.log(categories)
+    return NextResponse.json(categories); 
+  } catch (error: any) {
     console.error('Failed to fetch recipes:', error);
-    return NextResponse.error(); // Return an error response
+    return NextResponse.error();
   }
 }
