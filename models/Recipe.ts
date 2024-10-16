@@ -3,9 +3,10 @@ import mongoose, { Document, Schema } from "mongoose";
 export interface recipes extends Document{
   id: number,
   title: string;
+  des: string;
   ingredients:  string[];
-  instructions: string[];
-  categoryID: mongoose.Types.ObjectId;
+  instructions: string;
+  category: string;
   imageUrl: string;
 
 }
@@ -13,9 +14,10 @@ export interface recipes extends Document{
 const recipesSchema:Schema = new mongoose.Schema({
   id: {type: Number},
   title: { type: String, required:true },
+  des: { type: String, required:true },
   ingredients: { type: Array, of: String, required:true},
   instructions: { type: String, required:true },
-  categoryID:  { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true},
+  category:  { type: String, required:true},
   imageUrl:{type: String},
 },{collection: 'Recipe'});
 

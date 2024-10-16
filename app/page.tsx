@@ -5,7 +5,7 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="bg-[#FBF7F2] text-[#62645b] p-10 text-center">
+    <div className=" p-10 text-center">
       <Navbar/>
       <div>
         <h1 className="font-CBR font-heading mt-5 text-6xl">The Recipe for a Family</h1>
