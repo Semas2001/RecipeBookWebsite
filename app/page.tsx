@@ -1,7 +1,6 @@
 'use client'
 import Navbar from "@/components/navbar";
 import RecipeCarousel from "@/components/recentCarousel";
-import Image from "next/image";
 
 export default function Home() {
   return (

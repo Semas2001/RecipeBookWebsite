@@ -8,7 +8,7 @@ export async function GET() {
     const recipes = await Recipe.find();
     console.log(recipes)
     return NextResponse.json(recipes); 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Failed to fetch recipes:', error);
     return NextResponse.error();
   }

@@ -17,7 +17,7 @@ export default function RecipesPage() {
   }, []);
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="text-gray-200 container mx-auto p-4">
       <Navbar />
       <h1 className="text-2xl font-bold my-10 text-center">Recipes</h1>
 
