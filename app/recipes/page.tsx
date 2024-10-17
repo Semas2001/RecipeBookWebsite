@@ -1,7 +1,8 @@
-"use client"
+"use client";
 import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/navbar';
 import Recipes from '@/components/card';
+import Footer from '@/components/footer';
 
 export default function RecipesPage() {
   const [recipes, setRecipes] = useState([]);
@@ -17,7 +18,7 @@ export default function RecipesPage() {
   }, []);
 
   return (
-    <div className="text-gray-200 container mx-auto p-4">
+    <div className="flex flex-col min-h-screen text-gray-200 container mx-auto p-4">
       <Navbar />
       <h1 className="text-2xl font-bold my-10 text-center">Recipes</h1>
 
@@ -54,7 +55,7 @@ export default function RecipesPage() {
           </nav>
         </div>
       </div>
-      <div className="mt-3">
+      <div className="mt-3 flex-grow">
         <div id="segment-1" role="tabpanel" aria-labelledby="segment-item-1" className={selectedCategory === 'All' ? '' : 'hidden'}>
           <Recipes recipes={recipes} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
         </div>
@@ -70,6 +71,7 @@ export default function RecipesPage() {
           </div>
         ))}
       </div>
+      <Footer />
     </div>
   );
 }

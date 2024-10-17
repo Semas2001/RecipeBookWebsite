@@ -1,4 +1,5 @@
 'use client'
+import Footer from "@/components/footer";
 import Navbar from "@/components/navbar";
 import RecipeCarousel from "@/components/recentCarousel";
 
@@ -18,6 +19,7 @@ export default function Home() {
         <h2 className="border-b border-black mb-4 text-2xl">
         </h2>
         <RecipeCarousel/>
+        <Footer/>
       </div>
     </div>
   );
