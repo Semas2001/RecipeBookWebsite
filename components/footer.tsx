@@ -2,7 +2,7 @@ import React from 'react'
 
 const Footer = () => {
   return (
-    <section className=" bottom-0 left-0 w-full text-gray-700 bg-none body-font">
+    <section className=" mt-auto w-full text-gray-700 bg-none body-font">
         <hr className="border-t border-black my-4" />
     <div className="container flex flex-col items-center px-8 py-8 mx-auto max-w-7xl sm:flex-row">
         <a href="/" className="text-xl font-black leading-none text-gray-900 select-none logo">RECIPEBOOK<span className="text-indigo-600">.</span></a>

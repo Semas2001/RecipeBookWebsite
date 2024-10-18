@@ -3,5 +3,6 @@
 @tailwind utilities;
   
 body {
-    background-color:#a2a581; /* Global background color */
+    @apply bg-slate-100 text-black min-h-screen;
+    text: color black;
   }

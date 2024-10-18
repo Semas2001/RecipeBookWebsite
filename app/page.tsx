@@ -5,8 +5,7 @@ import RecipeCarousel from "@/components/recentCarousel";
 
 export default function Home() {
   return (
-    <div className=" text-white p-10 text-center">
-      <Navbar/>
+    <div className="  p-10 text-center">
       <div>
         <h1 className="font-CBR font-heading mt-5 text-6xl">The Recipe for a Family</h1>
         <p className="mt-4">
