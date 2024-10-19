@@ -1,6 +1,8 @@
 "use client"
 import Navbar from '@/components/navbar'
 import React, { useState } from 'react'
+import { getServerSession } from 'next-auth'
+import { redirect } from 'next/navigation'
 
 const AddRecipe = () => {
   const [title, setTitle] = useState("");
@@ -26,6 +28,11 @@ const AddRecipe = () => {
 
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
+
+    const session = await getServerSession();
+    if(!session){
+      redirect('/login')
+    }
 
     if (!title || !des || !ingredients || !instructions || !category || !imageUrl) {
       setError("All fields including the image need to be filled");
@@ -69,7 +76,6 @@ const AddRecipe = () => {
 
   return (
     <div className="text-gray-200 container mx-auto p-4">
-      <Navbar />
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           className="block w-full p-2 bg-gray-700"

@@ -1,9 +1,11 @@
 import NextAuth from "next-auth"
+import {Account, User as AuthUser} from "next-auth"
 import GithubProvider from "next-auth/providers/github"
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import Users from "@/models/Users"
 import dbConnect from "@/lib/mongodb"
+import { signIn } from "next-auth/react"
 
 export const authOptions: any = {
   // Configure one or more authentication providers
@@ -42,6 +44,30 @@ export const authOptions: any = {
     }),
     // ...add more providers here
   ],
+  callbacks: {
+    async signIn({user, account}: {user: AuthUser, account: Account}){
+        if(account?.provider == "credentials"){
+            return true;
+        }
+        if(account?.provider == "github"){
+            await dbConnect();
+            try{
+                const existingUser =  await Users.findOne({email: user.email});
+                if(existingUser){
+                    const newUser = new Users({
+                        email: user.email
+                    });
+
+                    await newUser.save();
+                    return true;
+                }return true;
+            }catch (err: any){
+                console.log("error saving user" , err)
+                return false
+            }
+        }
+    }
+  }
 }
 
 export const handler = NextAuth(authOptions);
