@@ -1,17 +1,19 @@
-"use client"
-import Navbar from '@/components/navbar'
-import React, { useState } from 'react'
-import { getServerSession } from 'next-auth'
-import { redirect } from 'next/navigation'
+"use client";
+import Navbar from '@/components/navbar';
+import React, { useState } from 'react';
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
 
 const AddRecipe = () => {
   const [title, setTitle] = useState("");
   const [des, setDes] = useState("");
-  const [ingredients, setIngredients] = useState("");
+  const [ingredients, setIngredients] = useState<string[]>([]); // Change to array
+  const [ingredientInput, setIngredientInput] = useState(""); // Input for new ingredient
   const [instructions, setInstructions] = useState("");
   const [category, setCategory] = useState("");
   const [imageUrl, setImage] = useState<File | null>(null);
   const [error, setError] = useState("");
+  
 
   // List of recipe categories
   const categories = [
@@ -26,15 +28,17 @@ const AddRecipe = () => {
     "Appetizer"
   ];
 
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+  const handleAddIngredient = () => {
+    if (ingredientInput.trim()) {
+      setIngredients((prev) => [...prev, ingredientInput.trim()]);
+      setIngredientInput(""); // Clear input field after adding
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const session = await getServerSession();
-    if(!session){
-      redirect('/login')
-    }
-
-    if (!title || !des || !ingredients || !instructions || !category || !imageUrl) {
+    if (!title || !des || !ingredients.length || !instructions || !category || !imageUrl) {
       setError("All fields including the image need to be filled");
       return;
     }
@@ -42,7 +46,7 @@ const AddRecipe = () => {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("des", des);
-    formData.append("ingredients", ingredients);
+    formData.append("ingredients", ingredients.join(", ")); // Join ingredients into a comma-separated string
     formData.append("instructions", instructions);
     formData.append("category", category);
     formData.append("image", imageUrl); // Append image to FormData
@@ -50,7 +54,7 @@ const AddRecipe = () => {
     try {
       const response = await fetch('http://localhost:3000/api/recipes', {
         method: "POST",
-        body: formData, // Send FormData
+        body: formData, 
       });
 
       if (!response.ok) {
@@ -63,10 +67,11 @@ const AddRecipe = () => {
       // Clear the form
       setTitle("");
       setDes("");
-      setIngredients("");
+      setIngredients([]); // Clear the ingredients list
       setInstructions("");
       setCategory("");
       setImage(null);
+      setIngredientInput(""); // Clear input field after submission
 
     } catch (error) {
       console.error("Error submitting the recipe:", error);
@@ -91,13 +96,32 @@ const AddRecipe = () => {
           type="text"
           placeholder='Description of Recipe'
         />
-        <input
-          className="block w-full p-2 bg-gray-700"
-          onChange={(e) => setIngredients(e.target.value)}
-          value={ingredients}
-          type="text"
-          placeholder='Ingredients (comma separated)'
-        />
+
+        {/* Ingredients Input */}
+        <div className="flex space-x-2">
+          <input
+            className="block w-full p-2 bg-gray-700"
+            type="text"
+            placeholder='Add an ingredient'
+            value={ingredientInput}
+            onChange={(e) => setIngredientInput(e.target.value)}
+          />
+          <button
+            type="button"
+            onClick={handleAddIngredient}
+            className="bg-blue-500 text-white p-2 rounded"
+          >
+            Add Ingredient
+          </button>
+        </div>
+
+        {/* Display Added Ingredients */}
+        <ul className="list-disc pl-5">
+          {ingredients.map((ingredient, index) => (
+            <li key={index} className="text-gray-300">{ingredient}</li>
+          ))}
+        </ul>
+
         <input
           className="block w-full p-2 bg-gray-700"
           onChange={(e) => setInstructions(e.target.value)}
@@ -132,7 +156,7 @@ const AddRecipe = () => {
         </button>
       </form>
     </div>
-  )
+  );
 }
 
 export default AddRecipe;
