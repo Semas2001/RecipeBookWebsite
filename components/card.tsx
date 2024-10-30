@@ -1,11 +1,12 @@
 "use client";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 import React, { useState } from 'react';
 
 interface Recipe {
-  id: number;
+  id: string;
   title: string;
-  category: string; // Category displayed instead of prep time
+  category: string;
   des: string;
   imageUrl: string;
 }
@@ -28,49 +29,60 @@ const categoryColors: { [key: string]: string } = {
   Pastr: "bg-pink-100 text-pink-800",
 };
 
+const formatTitleForURL = (title: string) => {
+  return title.toLowerCase().replace(/\s+/g, '-');
+};
+
 export default function Recipes({ recipes, selectedCategory, setSelectedCategory }: RecipesProps) {
   const filteredRecipes = selectedCategory === 'All' 
     ? recipes 
     : recipes.filter(recipe => recipe.category === selectedCategory);
 
+  if (filteredRecipes.length === 0) {
+    return <p className="text-center mt-4">No recipes found in this category.</p>;
+  }
+
   return (
     <div className="h-auto mt-20 "> 
       <div className="m-10 flex flex-wrap justify-evenly">
-      {filteredRecipes.map((recipe) => (
-        <div key={recipe.id} className="m-2 mb-20 w-80">
-          <div className="bg-[#e2d1bf] shadow-lg rounded-lg overflow-visible relative"> 
+        {filteredRecipes.map((recipe) => (
+          <div key={recipe.id} className="m-2 mb-20 w-80">
+            <div className="bg-[#e2d1bf] shadow-lg rounded-lg overflow-visible relative"> 
 
-            <div
-              style={{
-                backgroundImage: `url(${recipe.imageUrl})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                height: '160px', 
-                borderRadius: '50%', 
-                position: 'absolute', 
-                top: '-80px', 
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: '160px', 
-                zIndex: 1,
-                marginTop: '10px', 
-              }}
-            ></div>
-            <div className="p-4 pt-32"> 
-              <h1 className="font-bold text-xl text-gray-800 mb-2">{recipe.title}</h1>
-              <span className={`inline-flex items-center gap-x-1.5 py-1 px-2 rounded-full text-xs font-medium ${categoryColors[recipe.category]}`}>
-                {recipe.category}
-              </span>
-              <hr className="border-gray-300 my-2" />
-              <p className="text-sm text-gray-600 mb-4">{recipe.des}</p>
-              <button className="w-full bg-[#cfbfa7] text-black py-2 rounded-lg hover:bg-[#e4d5b7] transition">
-                View Recipe
-              </button>
+              <div
+                className="bg-cover bg-center rounded-full"
+                style={{
+                  backgroundImage: `url(${recipe.imageUrl})`,
+                  height: '160px', 
+                  width: '160px', 
+                  position: 'absolute', 
+                  top: '-80px', 
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  zIndex: 1,
+                  marginTop: '10px', 
+                }}
+                aria-label={recipe.title}
+              ></div>
+              <div className="p-4 pt-32"> 
+                <h1 className="font-bold text-xl text-gray-800 mb-2">{recipe.title}</h1>
+                <span className={`inline-flex items-center gap-x-1.5 py-1 px-2 rounded-full text-xs font-medium ${categoryColors[recipe.category]}`}>
+                  {recipe.category}
+                </span>
+                <hr className="border-gray-300 my-2" />
+                <p className="text-sm text-gray-600 mb-4">{recipe.des}</p>
+                <Link
+                  href={`/recipes/${formatTitleForURL(recipe.title)}`}
+                  className="text-blue-500 hover:underline"
+                >
+                  View Recipe
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
-  </div>
   );
 }
+
