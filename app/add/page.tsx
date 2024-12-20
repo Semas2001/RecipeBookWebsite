@@ -1,93 +1,103 @@
 "use client";
 import Navbar from '@/components/navbar';
-import React, { useRef, useState } from 'react';
-import { getServerSession } from 'next-auth';
-import { redirect } from 'next/navigation';
+import React, { useRef, useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 
 const AddRecipe = () => {
+  const { data: session } = useSession(); // Fetch session
   const [title, setTitle] = useState("");
   const [des, setDes] = useState("");
-  const [ingredients, setIngredients] = useState<string[]>([]); // Change to array
-  const [ingredientInput, setIngredientInput] = useState(""); // Input for new ingredient
+  const [ingredients, setIngredients] = useState<string[]>([]); // Array of ingredients
+  const [ingredientInput, setIngredientInput] = useState(""); // Single ingredient input
   const [instructions, setInstructions] = useState("");
   const [category, setCategory] = useState("");
-  const [imageUrl, setImage] = useState<File | null>(null);
-  const [error, setError] = useState("");
-  
+  const [imageFile, setImageFile] = useState<File | null>(null); // Image file state
+  const [error, setError] = useState<string | null>(null);
+  const ingredientInputRef = useRef<HTMLInputElement>(null); // Ref for focusing on ingredient input
 
-  // List of recipe categories
-  const categories = [
-    "Breakfast",
-    "Lunch",
-    "Dinner",
-    "Snack",
-    "Dessert",
-    "Beverage",
-    "Salad",
-    "Soup",
-    "Appetizer"
-  ];
+  const defaultImages: { [key: string]: string } = {
+    Breakfast: "/Breakfast.jpg",
+    Lunch: "/Lunch.jpg",
+    Dinner: "/Dinner.jpg",
+    Snack: "/Snacks.png",
+    Dessert: "/Dessert.jpg",
+    Drink: "/Drinks.jpg",
+    Salad: "/Salads.jpeg",
+    Pastry: "/Pastry.jpeg",
+    Sourdough: "/Sourdough.png",
+  };
 
-  const ingredientInputRef = useRef<HTMLInputElement>(null);
+  const categories = Object.keys(defaultImages);
+
+  useEffect(() => {
+    if (session?.user?.name) {
+      console.log(`Logged-in user: ${session.user.name}`);
+    }
+  }, [session]);
 
   const handleAddIngredient = () => {
-    // Add ingredient logic here
-    if (ingredientInput) {
-      setIngredients([...ingredients, ingredientInput]);
-      setIngredientInput(''); // Clear input
-
-      // Focus back on the input after adding
+    if (ingredientInput.trim()) {
+      setIngredients([...ingredients, ingredientInput.trim()]);
+      setIngredientInput(""); // Clear input
       if (ingredientInputRef.current) {
-        ingredientInputRef.current.focus();
+        ingredientInputRef.current.focus(); // Focus back on input
       }
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null); // Reset error state
 
-    if (!title || !des || !ingredients.length || !instructions || !category || !imageUrl) {
-      setError("All fields including the image need to be filled");
+    if (!session?.user?.id) {
+      setError("You must be logged in to add a recipe.");
+      return;
+    }
+
+    if (!title || !des || !ingredients.length || !instructions || !category) {
+      setError("All fields are required, including at least one ingredient.");
       return;
     }
 
     const formData = new FormData();
     formData.append("title", title);
     formData.append("des", des);
-    formData.append("ingredients", ingredients.join(", ")); // Join ingredients into a comma-separated string
+    formData.append("ingredients", ingredients.join(", "));
     formData.append("instructions", instructions);
     formData.append("category", category);
-    formData.append("image", imageUrl); // Append image to FormData
+    formData.append("user", session.user.id);
+    console.log("User ID:", session.user.id);
+
+    if (imageFile) {
+      formData.append("image", imageFile);
+    } else {
+      formData.append("image", defaultImages[category]); // Default image
+    }
 
     try {
-      const response = await fetch('http://localhost:3000/api/recipes', {
+      const response = await fetch("/api/recipes", {
         method: "POST",
-        body: formData, 
+        body: formData,
       });
 
       if (!response.ok) {
-        throw new Error("Something went wrong");
+        throw new Error(await response.text());
       }
 
-      setError(""); // Clear error message if successful
       alert("Recipe added successfully!");
-
-      // Clear the form
+      // Reset form fields
       setTitle("");
       setDes("");
-      setIngredients([]); // Clear the ingredients list
+      setIngredients([]);
+      setIngredientInput("");
       setInstructions("");
       setCategory("");
-      setImage(null);
-      setIngredientInput(""); // Clear input field after submission
-
-    } catch (error) {
-      console.error("Error submitting the recipe:", error);
-      setError("Failed to submit recipe");
+      setImageFile(null);
+    } catch (err: any) {
+      console.error("Error submitting the recipe:", err);
+      setError("Failed to submit the recipe.");
     }
   };
-  
-  
 
   return (
     <div className="flex justify-center min-h-screen items-center bg-slate-100">
@@ -97,29 +107,28 @@ const AddRecipe = () => {
           
           <input
             className="block w-full p-3 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onChange={(e) => setTitle(e.target.value)}
             value={title}
+            onChange={(e) => setTitle(e.target.value)}
             type="text"
             placeholder="Recipe Title"
           />
           
           <input
             className="block w-full p-3 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onChange={(e) => setDes(e.target.value)}
             value={des}
+            onChange={(e) => setDes(e.target.value)}
             type="text"
             placeholder="Description"
           />
-  
-          {/* Ingredients Input */}
+
           <div className="flex space-x-2">
             <input
               ref={ingredientInputRef}
-              className="block w-full p-3 border border-gray-300 cursor-text rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              type="text"
-              placeholder="Add an ingredient"
+              className="block w-full p-3 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={ingredientInput}
               onChange={(e) => setIngredientInput(e.target.value)}
+              type="text"
+              placeholder="Add an ingredient"
             />
             <button
               type="button"
@@ -129,23 +138,21 @@ const AddRecipe = () => {
               Add
             </button>
           </div>
-  
-          {/* Display Added Ingredients */}
-          <ul className="list-disc pl-5 space-y-1 text-gray-700">
+
+          <ul className="list-disc pl-5 text-gray-700">
             {ingredients.map((ingredient, index) => (
               <li key={index}>{ingredient}</li>
             ))}
           </ul>
-  
+
           <textarea
             className="block w-full p-3 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onChange={(e) => setInstructions(e.target.value)}
             value={instructions}
+            onChange={(e) => setInstructions(e.target.value)}
             placeholder="Instructions"
             rows={4}
           />
-  
-          {/* Category Dropdown */}
+
           <select
             className="block w-full p-3 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={category}
@@ -158,16 +165,16 @@ const AddRecipe = () => {
               </option>
             ))}
           </select>
-  
+
           <input
             className="block w-full p-3 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
             type="file"
             accept="image/*"
-            onChange={(e) => setImage(e.target.files?.[0] || null)}
+            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
           />
-  
+
           {error && <p className="text-red-500 text-sm">{error}</p>}
-  
+
           <button
             type="submit"
             className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition"
@@ -178,7 +185,6 @@ const AddRecipe = () => {
       </div>
     </div>
   );
-  
-}
+};
 
 export default AddRecipe;

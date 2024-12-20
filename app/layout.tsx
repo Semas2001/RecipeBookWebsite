@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/navbar";
 import { getServerSession } from "next-auth";
 import SessionProvider from "@/utils/SessionProvider"
+import { authOptions } from "./api/auth/[...nextauth]/route";
 
 
 const CBR = localFont({
@@ -27,7 +28,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   return (
     <html lang="en">
       <body className={`${CBR.variable} ${CBB.variable} antialiased`}>

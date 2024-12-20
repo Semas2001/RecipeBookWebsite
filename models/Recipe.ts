@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { UserDocument } from "./Users";
 
 export interface RecipeDocument extends Document {
   title: string;
@@ -7,6 +8,7 @@ export interface RecipeDocument extends Document {
   instructions: string;
   category: string;
   imageUrl: string;
+  user: mongoose.Types.ObjectId | UserDocument;
 }
 
 const recipesSchema: Schema = new mongoose.Schema({
@@ -16,12 +18,19 @@ const recipesSchema: Schema = new mongoose.Schema({
   instructions: { type: String, required: true },
   category: { type: String, required: true },
   imageUrl: { type: String },
-}, { 
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+}, 
+{ 
   timestamps: true,
   collection: 'Recipe',
   versionKey: false
   
 });
+recipesSchema.index({ title: 1, category: 1, user: 1 });
 
 const Recipe = mongoose.models.Recipe || mongoose.model<RecipeDocument>('Recipe', recipesSchema);
 
