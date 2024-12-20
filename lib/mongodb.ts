@@ -13,5 +13,3 @@ async function dbConnect(){
 
 
 export default dbConnect;
-
-//mongodb+srv://semasarmonaitis:Semas2001@clu}ster0.34dggy4.mongodb.net
