@@ -84,6 +84,15 @@ const Navbar: React.FC = () => {
                     >
                       Add a Recipe
                     </Link>
+                    <Link
+                      href="/recipes/my-recipes"
+                      className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100"
+                      role="menuitem"
+                      tabIndex={-1}
+                      onClick={handleOptionSelect} // Close dropdown on click
+                    >
+                      My Recipes
+                    </Link>
                     <button
                       className="text-gray-700 block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
                       onClick={() => {
@@ -95,6 +104,7 @@ const Navbar: React.FC = () => {
                     >
                       Sign Out
                     </button>
+                    
                   </div>
                 </div>
               )}
