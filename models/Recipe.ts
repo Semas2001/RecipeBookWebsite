@@ -18,16 +18,18 @@ export interface RecipeDocument extends Document {
   user: Types.ObjectId;
 }
 
-const ingredientSchema = new Schema<Ingredient>({
+const ingredientSchema = new Schema({
   name: { type: String, required: true },
   amount: { type: String, required: true },
-  unit: { type: String, required: true },
+  unit: { type: String, default: '' },
 });
+
+const Ingredient = mongoose.model('Ingredient', ingredientSchema);
 
 const recipesSchema: Schema = new mongoose.Schema({
   title: { type: String, required: true },
   des: { type: String, required: true },
-  ingredients: [ingredientSchema],
+  ingredients: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ingredient' }],
   instructions: { type: String, required: true },
   category: { type: String, required: true },
   imageUrl: { type: String },

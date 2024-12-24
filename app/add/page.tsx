@@ -7,7 +7,7 @@ const AddRecipe = () => {
   const { data: session } = useSession(); // Fetch session
   const [title, setTitle] = useState("");
   const [des, setDes] = useState("");
-  const [ingredients, setIngredients] = useState<{ name: string; amount: string; unit: string }[]>([]); // Added name to ingredients
+  const [ingredients, setIngredients] = useState([{ name: "", amount: "", unit: "" }]); // Ingredient state
   const [ingredientName, setIngredientName] = useState(""); // Name of the ingredient
   const [amount, setAmount] = useState(""); // Amount for ingredient
   const [unit, setUnit] = useState(""); // Unit of measurement
@@ -32,7 +32,15 @@ const AddRecipe = () => {
   const categories = Object.keys(defaultImages);
 
   const measurementUnits = [
-    'g', 'kg', 'ml', 'L', 'cups', 'tsp', 'TB', 'oz', 'lb',
+    "g",
+    "kg",
+    "ml",
+    "L",
+    "cups",
+    "tsp",
+    "TB",
+    "oz",
+    "lb",
   ];
 
   useEffect(() => {
@@ -42,24 +50,30 @@ const AddRecipe = () => {
   }, [session]);
 
   const handleAddIngredient = () => {
-    if (amount.trim()) {
-      const newIngredient = {
-        name: ingredientName,
-        amount: amount.trim(),
-        unit: unit.trim() || "", 
-      };
-      setIngredients([...ingredients, newIngredient]);
-      setAmount(""); // Clear amount field
-      setUnit(""); // Clear unit field
-      if (ingredientInputRef.current) {
-        ingredientInputRef.current.focus(); // Focus back on input
-      }
+    if (!ingredientName.trim() || !amount.trim()) {
+      setError("Both ingredient name and amount are required.");
+      return;
+    }
+    const newIngredient = {
+      name: ingredientName,
+      amount: amount.trim(),
+      unit: unit.trim() || "",
+    };
+    setIngredients([...ingredients, newIngredient]);
+    setIngredientName("");
+    setAmount("");
+    setUnit("");
+    setError(null); // Clear any previous errors
+    if (ingredientInputRef.current) {
+      ingredientInputRef.current.focus();
     }
   };
 
   const handleRemoveIngredient = (index: number) => {
-  setIngredients((prevIngredients) => prevIngredients.filter((_, i) => i !== index));
-};
+    setIngredients((prevIngredients) =>
+      prevIngredients.filter((_, i) => i !== index)
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,7 +92,7 @@ const AddRecipe = () => {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("des", des);
-    formData.append("ingredients", JSON.stringify(ingredients)); // Send the ingredients as an array of objects
+    formData.append("ingredients", JSON.stringify(ingredients)); // Send ingredients as JSON
     formData.append("instructions", instructions);
     formData.append("category", category);
     formData.append("user", session.user.id);
@@ -86,7 +100,7 @@ const AddRecipe = () => {
     if (imageFile) {
       formData.append("image", imageFile);
     } else {
-      formData.append("image", defaultImages[category]); // Default image
+      formData.append("image", defaultImages[category]);
     }
 
     try {
@@ -103,7 +117,7 @@ const AddRecipe = () => {
       // Reset form fields
       setTitle("");
       setDes("");
-      setIngredients([]);
+      setIngredients([{ name: "", amount: "", unit: "" }]); // Reset ingredients to default state
       setAmount("");
       setUnit("");
       setInstructions("");
@@ -198,7 +212,6 @@ const AddRecipe = () => {
               ))}
             </ul>
           </div>
-
 
           <textarea
             className="block w-full p-3 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
