@@ -2,6 +2,9 @@
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import React, { useState } from 'react';
+import { usePathname } from 'next/navigation';
+
+
 
 interface Recipe {
   id: string;
@@ -34,6 +37,7 @@ const formatTitleForURL = (title: string) => {
 };
 
 export default function Recipes({ recipes, selectedCategory, setSelectedCategory }: RecipesProps) {
+  const pathname = usePathname();
   const filteredRecipes = selectedCategory === 'All' 
     ? recipes 
     : recipes.filter(recipe => recipe.category === selectedCategory);
@@ -73,10 +77,18 @@ export default function Recipes({ recipes, selectedCategory, setSelectedCategory
                 <p className="text-sm text-gray-600 mb-4">{recipe.des}</p>
                 <Link
                   href={`/recipes/${formatTitleForURL(recipe.title)}`}
-                  className="text-blue-500 hover:underline"
+                  className="text-blue-500 hover:underline ml-2"
                 >
                   View Recipe
                 </Link>
+                {pathname.includes('/my-recipes') && (
+                  <Link
+                    href={`/recipes/${formatTitleForURL(recipe.title)}?edit=true`}
+                    className="text-blue-500 hover:underline ml-20"
+                  >
+                    Update Recipe
+                  </Link>
+                )}
               </div>
             </div>
           </div>

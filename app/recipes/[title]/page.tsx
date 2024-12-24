@@ -1,5 +1,6 @@
 "use client";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import router from "next/router";
 import { useEffect, useState } from "react";
 
 interface Recipe {
@@ -12,20 +13,23 @@ interface Recipe {
 
 export default function RecipeDetail() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const isEditing = searchParams.get("edit") === "true";
   const title = pathname.split("/").pop();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
+  const [updatedRecipe, setUpdatedRecipe] = useState<Recipe | null>(null);
 
   useEffect(() => {
     if (title) {
       fetch(`/api/recipes/${title}`)
-      
         .then((response) => response.json())
         .then((data) => {
           if (data.message) {
             console.error(data.message);
           } else {
             setRecipe(data);
+            setUpdatedRecipe(data); // Initialize edit state
           }
           setLoading(false);
         })
@@ -34,7 +38,57 @@ export default function RecipeDetail() {
           setLoading(false);
         });
     }
-  }, [title]);
+  }, [title]);  
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    if (updatedRecipe) {
+      setUpdatedRecipe({
+        ...updatedRecipe,
+        [e.target.name]: e.target.value,
+      });
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      const response = await fetch(`/api/recipes/${title}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedRecipe),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update recipe");
+      }
+
+      alert("Recipe updated successfully!");
+    } catch (error) {
+      console.error("Error updating recipe:", error);
+      alert("Failed to update recipe.");
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!confirm("Are you sure you want to delete this recipe?")) return;
+
+    try {
+      const response = await fetch(`/api/recipes/${title}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete recipe");
+      }
+
+      alert("Recipe deleted successfully!");
+      router.push("/my-recipes"); // Redirect to recipes list
+    } catch (error) {
+      console.error("Error deleting recipe:", error);
+      alert("Failed to delete recipe.");
+    }
+  };
 
   if (loading)
     return (
@@ -49,40 +103,71 @@ export default function RecipeDetail() {
       </div>
     );
 
-  return (
-    <div className="container mx-auto p-4 text-gray-800 dark:text-gray-200">
-      <div className="flex flex-col items-center text-center mb-6">
-        <h1 className="text-4xl font-bold mb-4">{recipe.title}</h1>
-        <img
-          src={recipe.imageUrl}
-          alt={recipe.title}
-          className="w-full max-w-lg rounded-lg shadow-lg"
-        />
-      </div>
+    return (
+      <div className="container mx-auto p-4">
+        <h1 className="text-4xl font-bold mb-4">{isEditing ? "Edit Recipe" : recipe.title}</h1>
+        <img src={recipe.imageUrl} alt={recipe.title} className="mb-4" />
+  
+        {isEditing ? (
+          <div>
+            <label className="block mb-2 font-bold">Title:</label>
+            <input
+              type="text"
+              name="title"
+              value={updatedRecipe?.title || ""}
+              onChange={handleInputChange}
+              className="border p-2 w-full mb-4"
+            />
+  
+            <label className="block mb-2 font-bold">Description:</label>
+            <textarea
+              name="des"
+              value={updatedRecipe?.des || ""}
+              onChange={handleInputChange}
+              className="border p-2 w-full mb-4"
+            />
 
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold mb-2">Description</h2>
-        <p className="text-gray-700 dark:text-gray-300">{recipe.des}</p>
-      </div>
+            <label className="block mb-2 font-bold">Ingredients:</label>
+            <textarea
+              name="ingredient"
+              value={updatedRecipe?.ingredients || ""}
+              onChange={handleInputChange}
+              className="border p-2 w-full mb-4"
+            />
+  
+            <label className="block mb-2 font-bold">Instructions:</label>
+            <textarea
+              name="instructions"
+              value={updatedRecipe?.instructions || ""}
+              onChange={handleInputChange}
+              className="border p-2 w-full mb-4"
+            />
+  
+            <button
+              onClick={handleSave}
+              className="bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              Save Changes
+            </button>
 
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold mb-2">Ingredients</h2>
-        <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
-          {Array.isArray(recipe.ingredients)
-            ? recipe.ingredients.map((item, index) => <li key={index}>{item}</li>)
-            : recipe.ingredients.split(",").map((item, index) => (
-                <li key={index}>{item.trim()}</li>
-              ))}
-        </ul>
+            <button
+              onClick={handleDelete}
+              className="bg-red-500 text-white px-4 py-2 rounded"
+            >
+              Delete Recipe
+            </button>
+          </div>
+        ) : (
+          <div>
+            <p className="mb-4">{recipe.des}</p>
+            <h2 className="text-2xl font-bold mb-2">Ingredients:</h2>
+            <p>{recipe.ingredients}</p>
+            <h2 className="text-2xl font-bold mb-2">Instructions:</h2>
+            <p className="mb-4">{recipe.instructions}</p>
+            
+            
+          </div>
+        )}
       </div>
-
-
-      <div>
-        <h2 className="text-2xl font-semibold mb-2">Instructions</h2>
-        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
-          {recipe.instructions}
-        </p>
-      </div>
-    </div>
-  );
-}
+    );
+  }
