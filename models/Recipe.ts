@@ -1,20 +1,33 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { UserDocument } from "./Users";
+import { Types } from "mongoose";
+
+
+interface Ingredient {
+  name: string;
+  amount: string;
+  unit: string;
+}
 
 export interface RecipeDocument extends Document {
   title: string;
   des: string;
-  ingredients: string[];
+  ingredients: Ingredient[];
   instructions: string;
   category: string;
   imageUrl: string;
-  user: mongoose.Types.ObjectId | UserDocument;
+  user: Types.ObjectId;
 }
+
+const ingredientSchema = new Schema<Ingredient>({
+  name: { type: String, required: true },
+  amount: { type: String, required: true },
+  unit: { type: String, required: true },
+});
 
 const recipesSchema: Schema = new mongoose.Schema({
   title: { type: String, required: true },
   des: { type: String, required: true },
-  ingredients: { type: [String], required: true },
+  ingredients: [ingredientSchema],
   instructions: { type: String, required: true },
   category: { type: String, required: true },
   imageUrl: { type: String },

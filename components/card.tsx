@@ -4,9 +4,8 @@ import Link from "next/link";
 import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
 
-
-
 interface Recipe {
+  [x: string]: string;
   id: string;
   title: string;
   category: string;
@@ -76,18 +75,15 @@ export default function Recipes({ recipes, selectedCategory, setSelectedCategory
                 <hr className="border-gray-300 my-2" />
                 <p className="text-sm text-gray-600 mb-4">{recipe.des}</p>
                 <Link
-                  href={`/recipes/${formatTitleForURL(recipe.title)}`}
+                  href={`/recipes/${formatTitleForURL(recipe._id)}`}
                   className="text-blue-500 hover:underline ml-2"
                 >
                   View Recipe
                 </Link>
                 {pathname.includes('/my-recipes') && (
-                  <Link
-                    href={`/recipes/${formatTitleForURL(recipe.title)}?edit=true`}
-                    className="text-blue-500 hover:underline ml-20"
-                  >
-                    Update Recipe
-                  </Link>
+                  <Link href={`/recipes/${recipe._id}?edit=true`} className="text-blue-500 hover:underline ml-20">
+                  Update Recipe
+                </Link>
                 )}
               </div>
             </div>

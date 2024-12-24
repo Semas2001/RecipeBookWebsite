@@ -1,4 +1,4 @@
-"use client";
+'use client'
 import Navbar from '@/components/navbar';
 import React, { useRef, useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
@@ -7,8 +7,10 @@ const AddRecipe = () => {
   const { data: session } = useSession(); // Fetch session
   const [title, setTitle] = useState("");
   const [des, setDes] = useState("");
-  const [ingredients, setIngredients] = useState<string[]>([]); // Array of ingredients
-  const [ingredientInput, setIngredientInput] = useState(""); // Single ingredient input
+  const [ingredients, setIngredients] = useState<{ name: string; amount: string; unit: string }[]>([]); // Added name to ingredients
+  const [ingredientName, setIngredientName] = useState(""); // Name of the ingredient
+  const [amount, setAmount] = useState(""); // Amount for ingredient
+  const [unit, setUnit] = useState(""); // Unit of measurement
   const [instructions, setInstructions] = useState("");
   const [category, setCategory] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null); // Image file state
@@ -29,6 +31,10 @@ const AddRecipe = () => {
 
   const categories = Object.keys(defaultImages);
 
+  const measurementUnits = [
+    'g', 'kg', 'ml', 'L', 'cups', 'tsp', 'TB', 'oz', 'lb',
+  ];
+
   useEffect(() => {
     if (session?.user?.name) {
       console.log(`Logged-in user: ${session.user.name}`);
@@ -36,18 +42,28 @@ const AddRecipe = () => {
   }, [session]);
 
   const handleAddIngredient = () => {
-    if (ingredientInput.trim()) {
-      setIngredients([...ingredients, ingredientInput.trim()]);
-      setIngredientInput(""); // Clear input
+    if (amount.trim()) {
+      const newIngredient = {
+        name: ingredientName,
+        amount: amount.trim(),
+        unit: unit.trim() || "", 
+      };
+      setIngredients([...ingredients, newIngredient]);
+      setAmount(""); // Clear amount field
+      setUnit(""); // Clear unit field
       if (ingredientInputRef.current) {
         ingredientInputRef.current.focus(); // Focus back on input
       }
     }
   };
 
+  const handleRemoveIngredient = (index: number) => {
+  setIngredients((prevIngredients) => prevIngredients.filter((_, i) => i !== index));
+};
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null); // Reset error state
+    setError(null);
 
     if (!session?.user?.id) {
       setError("You must be logged in to add a recipe.");
@@ -62,11 +78,10 @@ const AddRecipe = () => {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("des", des);
-    formData.append("ingredients", ingredients.join(", "));
+    formData.append("ingredients", JSON.stringify(ingredients)); // Send the ingredients as an array of objects
     formData.append("instructions", instructions);
     formData.append("category", category);
     formData.append("user", session.user.id);
-    console.log("User ID:", session.user.id);
 
     if (imageFile) {
       formData.append("image", imageFile);
@@ -89,7 +104,8 @@ const AddRecipe = () => {
       setTitle("");
       setDes("");
       setIngredients([]);
-      setIngredientInput("");
+      setAmount("");
+      setUnit("");
       setInstructions("");
       setCategory("");
       setImageFile(null);
@@ -101,7 +117,7 @@ const AddRecipe = () => {
 
   return (
     <div className="flex justify-center min-h-screen items-center bg-slate-100">
-      <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+      <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-[40rem]">
         <form onSubmit={handleSubmit} className="space-y-6">
           <h1 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Add a New Recipe</h1>
           
@@ -121,29 +137,68 @@ const AddRecipe = () => {
             placeholder="Description"
           />
 
-          <div className="flex space-x-2">
+          <div className="space-y-4">
+            {/* Ingredient Name */}
             <input
               ref={ingredientInputRef}
               className="block w-full p-3 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={ingredientInput}
-              onChange={(e) => setIngredientInput(e.target.value)}
+              value={ingredientName}
+              onChange={(e) => setIngredientName(e.target.value)}
               type="text"
-              placeholder="Add an ingredient"
+              placeholder="Ingredient Name"
             />
-            <button
-              type="button"
-              onClick={handleAddIngredient}
-              className="bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition"
-            >
-              Add
-            </button>
+            
+            {/* Amount and Unit */}
+            <div className="flex items-center space-x-2">
+              <div className="flex-1 p-3 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div className="flex space-x-2">
+                  <input
+                    className="flex-1 p-2 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    type="text"
+                    placeholder="Amount"
+                  />
+                  <select
+                    className="p-2 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={unit}
+                    onChange={(e) => setUnit(e.target.value)}
+                  >
+                    <option value="">Select Unit (Optional)</option>
+                    {measurementUnits.map((unit, index) => (
+                      <option key={index} value={unit}>
+                        {unit}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleAddIngredient}
+                className="bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition"
+              >
+                Add Ingredient
+              </button>
+            </div>
+
+            <ul className="list-disc pl-5 text-gray-700">
+              {ingredients.map((ingredient, index) => (
+                <li key={index} className="flex items-center justify-between">
+                  {ingredient.name} - {ingredient.amount} {ingredient.unit}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveIngredient(index)}
+                    className="text-red-500 ml-2 hover:text-red-700"
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <ul className="list-disc pl-5 text-gray-700">
-            {ingredients.map((ingredient, index) => (
-              <li key={index}>{ingredient}</li>
-            ))}
-          </ul>
 
           <textarea
             className="block w-full p-3 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
