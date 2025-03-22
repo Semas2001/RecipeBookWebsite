@@ -47,7 +47,7 @@ const Navbar: React.FC = () => {
                   onClick={toggleDropdown}
                   className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-100"
                   id="menu-button"
-                  aria-expanded={isOpen} // Update for better accessibility
+                  aria-expanded={isOpen}
                   aria-haspopup="true"
                 >
                   {session.user?.name}

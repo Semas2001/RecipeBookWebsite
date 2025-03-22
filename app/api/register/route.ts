@@ -1,32 +1,29 @@
-import User from '@/models/Users';
-import dbConnect from '@/lib/mongodb';
-import bcrypt from 'bcryptjs';
-import { NextResponse } from 'next/server';
+import {connect} from "@/utils/config/dbConfig";
+import User from "@/models/Users";
+import bcyrptjs from "bcryptjs";
+import { NextRequest, NextResponse } from "next/server";
 
-export const POST = async (request: any) => {
-  const { email, password, name } = await request.json();
+export async function POST(req: NextRequest) {
+    await connect();
 
-  // Connect to the database
-  await dbConnect();
+    try{
+        const {email, password, name} = await req.json();
 
-  try {
-    // Check if the user already exists
-    const existingUser = await User.findOne({ email });
+        const ifUserExists = await User.findOne({email});
 
-    if (existingUser) {
-      return new NextResponse(JSON.stringify({ message: "Email is already in use" }), { status: 400, headers: { "Content-Type": "application/json" } });
+        if(ifUserExists) {
+            return NextResponse.json({error: "User already exists"}, {status: 400});
+        }
+
+        const salt = await bcyrptjs.genSalt(10);
+        const hashedPassword = await bcyrptjs.hash(password, salt);
+        const savedUser = new User({email, password: hashedPassword, name});
+
+        
+        return NextResponse.json({message: "User created successfully"}, {status: 201});
+
+    }catch (error: any) {
+        return NextResponse.json({error: error.message}, {status: 500});
     }
-
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ email, password: hashedPassword, name });
-
-    // Save the user
-    await newUser.save();
-    return new NextResponse(JSON.stringify({ message: "User is registered successfully" }), { status: 200, headers: { "Content-Type": "application/json" } });
     
-  } catch (err) {
-    console.error("Error in registration:", err); // Log detailed error
-    return new NextResponse(JSON.stringify({ message: "Internal Server Error" }), { status: 500, headers: { "Content-Type": "application/json" } });
-  }
-};
+}

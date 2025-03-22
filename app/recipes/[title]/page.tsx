@@ -13,7 +13,7 @@ interface Recipe {
   title: string;
   des: string;
   instructions: string;
-  ingredients: Ingredient[];  // Updated to array of objects
+  ingredients: Ingredient[]; 
   imageUrl: string;
 }
 
@@ -35,7 +35,9 @@ export default function RecipeDetail() {
             console.error(data.message);
           } else {
             setRecipe(data);
-            setUpdatedRecipe(data); // Initialize edit state
+            setUpdatedRecipe({
+              ...data,
+              ingredients: data.ingredients || [],});
           }
           setLoading(false);
         })
@@ -89,7 +91,7 @@ export default function RecipeDetail() {
       }
 
       alert("Recipe deleted successfully!");
-      router.push("/my-recipes"); // Redirect to recipes list
+      router.push("/my-recipes");
     } catch (error) {
       console.error("Error deleting recipe:", error);
       alert("Failed to delete recipe.");
@@ -169,7 +171,7 @@ export default function RecipeDetail() {
           />
 
           <label className="block mb-2 font-bold">Ingredients:</label>
-          {updatedRecipe?.ingredients.map((ingredient, index) => (
+          {updatedRecipe.ingredients.map((ingredient, index) => (
             <div key={index} className="mb-4">
               <input
                 type="text"

@@ -1,16 +1,21 @@
-import mongoose, { Document, Schema } from "mongoose";
-
-export interface UserDocument extends Document {
-  name: string;
-  email: string;
-  password: string; 
-}
+import mongoose, { Schema } from "mongoose";
 
 const userSchema: Schema = new mongoose.Schema(
   {
-    username: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    id: { type: Schema.Types.ObjectId, required: true },
+    name: { 
+      type: String, 
+      required: [true, "please provide your Name"]
+    },
+    email: { 
+      type: String, 
+      required: [true, "please provide your email"],
+      unique: true 
+    },
+    password: { 
+      type: String, 
+      required: [true, "please provide a password"] 
+    },
   },
   {
     timestamps: true,
@@ -20,6 +25,6 @@ const userSchema: Schema = new mongoose.Schema(
 );
 
 const User =
-  mongoose.models.User || mongoose.model<UserDocument>("User", userSchema);
+  mongoose.models.User || mongoose.model("User", userSchema);
 
 export default User;

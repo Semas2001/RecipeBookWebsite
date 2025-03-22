@@ -1,35 +1,25 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { Types } from "mongoose";
+import { IngredientDocument } from "./Ingredients";
 
 
-interface Ingredient {
-  name: string;
-  amount: string;
-  unit: string;
-}
+
 
 export interface RecipeDocument extends Document {
   title: string;
   des: string;
-  ingredients: Ingredient[];
+  ingredients: IngredientDocument[];
   instructions: string;
   category: string;
   imageUrl: string;
   user: Types.ObjectId;
 }
 
-const ingredientSchema = new Schema({
-  name: { type: String, required: true },
-  amount: { type: String, required: true },
-  unit: { type: String, default: '' },
-});
-
-const Ingredient = mongoose.model('Ingredient', ingredientSchema);
 
 const recipesSchema: Schema = new mongoose.Schema({
   title: { type: String, required: true },
   des: { type: String, required: true },
-  ingredients: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ingredient' }],
+  ingredients: [{ type: Schema.Types.ObjectId, ref: 'Ingredient' }],
   instructions: { type: String, required: true },
   category: { type: String, required: true },
   imageUrl: { type: String },

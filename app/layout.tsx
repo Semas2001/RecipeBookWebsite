@@ -32,7 +32,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${CBR.variable} ${CBB.variable} antialiased`}>
-        <SessionProvider session={session}>
+        <SessionProvider>
         <Navbar/>
         {children}
         </SessionProvider>
